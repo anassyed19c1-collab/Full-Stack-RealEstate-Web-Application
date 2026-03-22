@@ -49,15 +49,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Password hash karo save se pehle
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+// hash Password before save
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
-// Password compare karne ka method
+// Password compare
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
