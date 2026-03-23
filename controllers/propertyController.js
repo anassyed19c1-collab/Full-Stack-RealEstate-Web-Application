@@ -139,8 +139,8 @@ export const createProperty = async (req, res) => {
             features: {
                 bedrooms,
                 bathrooms,
-                parking,
-                furnished,
+                parking: parking === "true",
+                furnished: furnished === "true",
             },
             images,
             postedBy: req.user._id,
