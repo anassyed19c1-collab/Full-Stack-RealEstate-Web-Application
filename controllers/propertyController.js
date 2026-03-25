@@ -77,9 +77,11 @@ export const getSingleProperty = async (req, res) => {
             });
         }
 
-        // Views increment karo
-        property.views += 1;
-        await property.save();
+        if (!req.query.admin) {
+            property.views += 1;
+            await property.save();
+        }
+
 
         res.status(200).json({
             success: true,
@@ -118,8 +120,8 @@ export const createProperty = async (req, res) => {
         } = req.body;
 
         // Images Cloudinary se aa rahi hain
-        const images = req.files? req.files.map((file) => (
-            { url: file.path, public_id: file.filename}
+        const images = req.files ? req.files.map((file) => (
+            { url: file.path, public_id: file.filename }
         )) : [];
 
         const property = await Property.create({
