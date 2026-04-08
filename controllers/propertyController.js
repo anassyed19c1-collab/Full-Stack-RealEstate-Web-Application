@@ -167,62 +167,71 @@ export const createProperty = async (req, res) => {
 // @route   PUT /api/properties/:id
 // @access  Private (Admin)
 export const updateProperty = async (req, res) => {
-  try {
+    try {
 
-    const property = await Property.findById(req.params.id);
+        const property = await Property.findById(req.params.id);
 
-    if (!property) {
-      return res.status(404).json({
-        success: false,
-        message: "Property not found",
-      });
+        if (!property) {
+            return res.status(404).json({
+                success: false,
+                message: "Property not found",
+            });
+        }
+
+        if (property.postedBy.toString() !== req.user._id.toString() &&
+            req.user.role !== "admin"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "Not authorized to update this property",
+            });
+        }
+
+        // Images handle 
+        let images = property.images;
+
+        if (req.files && req.files.length > 0) {
+            // New images uploaded on cloudnary
+            const newImages = req.files.map((file) => ({
+                url: file.path,
+                public_id: file.filename,
+            }));
+
+            // Existing images
+            const existingImages = req.body.existingImages
+                ? JSON.parse(req.body.existingImages)
+                : [];
+
+            images = [...existingImages, ...newImages];
+        } else if (req.body.images) {
+            // only existing images update
+            images = req.body.images;
+        }
+
+        const updatedProperty = await Property.findByIdAndUpdate(
+            req.params.id,
+            {
+                ...req.body,
+                images,
+                // Nested objects properly updated
+                ...(req.body.location && { location: req.body.location }),
+                ...(req.body.area && { area: req.body.area }),
+                ...(req.body.features && { features: req.body.features }),
+            },
+            { returnDocument: "after", runValidators: true }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Property updated successfully",
+            data: updatedProperty,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
-
-    // Images handle 
-    let images = property.images;
-
-    if (req.files && req.files.length > 0) {
-      // New images uploaded on cloudnary
-      const newImages = req.files.map((file) => ({
-        url: file.path,
-        public_id: file.filename,
-      }));
-
-      // Existing images
-      const existingImages = req.body.existingImages
-        ? JSON.parse(req.body.existingImages)
-        : [];
-
-      images = [...existingImages, ...newImages];
-    } else if (req.body.images) {
-      // only existing images update
-      images = req.body.images;
-    }
-
-    const updatedProperty = await Property.findByIdAndUpdate(
-      req.params.id,
-      {
-        ...req.body,
-        images,
-        // Nested objects properly updated
-        ...(req.body.location && { location: req.body.location }),
-        ...(req.body.area && { area: req.body.area }),
-        ...(req.body.features && { features: req.body.features }),
-      },
-    { returnDocument: "after", runValidators: true }
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Property updated successfully",
-      data: updatedProperty,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
 };
 
 
@@ -239,6 +248,15 @@ export const deleteProperty = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Property not found",
+            });
+        }
+
+        if ( property.postedBy.toString() !== req.user._id.toString() &&
+            req.user.role !== "admin"
+        ) {
+            return res.status(403).json({
+                success: false,
+                message: "Not authorized to delete this property",
             });
         }
 

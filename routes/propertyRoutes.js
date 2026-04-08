@@ -18,7 +18,7 @@ router.get("/", getAllProperties);
 router.get("/:id", getSingleProperty);
 
 // Private routes (Admin only)
-router.post("/", protect, adminOnly, upload.array("images", 10), createProperty);
+router.post("/", protect, upload.array("images", 10), createProperty);
 router.put("/:id", protect, adminOnly, upload.array("images", 10), updateProperty);
 router.delete("/:id", protect, adminOnly, deleteProperty);
 
