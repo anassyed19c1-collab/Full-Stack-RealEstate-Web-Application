@@ -178,7 +178,16 @@ export const updateProperty = async (req, res) => {
             });
         }
 
-        if (property.postedBy.toString() !== req.user._id.toString() &&
+        console.log("postedBy:", property.postedBy);
+        console.log("req.user._id:", req.user._id);
+        console.log("postedBy toString:", property.postedBy.toString());
+        console.log("user._id toString:", req.user._id.toString());
+
+        const postedById = property.postedBy._id
+            ? property.postedBy._id.toString()
+            : property.postedBy.toString();
+
+        if (postedById !== req.user._id.toString() &&
             req.user.role !== "admin"
         ) {
             return res.status(403).json({
@@ -251,7 +260,7 @@ export const deleteProperty = async (req, res) => {
             });
         }
 
-        if ( property.postedBy.toString() !== req.user._id.toString() &&
+        if (property.postedBy.toString() !== req.user._id.toString() &&
             req.user.role !== "admin"
         ) {
             return res.status(403).json({
