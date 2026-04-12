@@ -89,7 +89,7 @@ realestate-backend/
 
 ```bash
 # Clone the repo
-git clone https://github.com/username/realestate-backend.git
+git clone https://github.com/anassyed19c1-collab/realestate-backend.git
 
 # Go to project directory
 cd realestate-backend
@@ -156,7 +156,7 @@ RESEND_API_KEY=your_resend_api_key
 ## 👨‍💻 Author
 
 **Your Name**
-- GitHub: [@username](https://github.com/username)
+- GitHub: [@Anas](https://github.com/anassyed19c1-collab)
 
 ---
 
